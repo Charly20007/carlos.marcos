@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import CategoryFilter from '../CategoryFilter/CategoryFilter';
 import NameFilter from '../NameFilter/NameFilter';
 import PremiereCard from '../../UI/Card';
 import { Premiere } from '../../interface/interface';
+import { fetchPremieres } from '../../../services/premiereService';
 
 const HomePremiere: React.FC = () => {
   const [premieres, setPremieres] = useState<Premiere[]>([]);
@@ -14,12 +14,8 @@ const HomePremiere: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://cp-staging.onrender.com/v1/premieres');
-        const premieresWithCategories = response.data.premieres.map((premiere: Premiere) => ({
-          ...premiere,
-          category: getRandomCategory(),
-        }));
-        setPremieres(premieresWithCategories);
+        const premieresData = await fetchPremieres();
+        setPremieres(premieresData);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching premieres:', error);
@@ -29,12 +25,6 @@ const HomePremiere: React.FC = () => {
 
     fetchData();
   }, []);
-
-  const getRandomCategory = () => {
-    const categories = ['Accion', 'Crimen', 'Drama'];
-    const randomIndex = Math.floor(Math.random() * categories.length);
-    return categories[randomIndex];
-  };
 
   const filterByCategory = (category: string | null) => {
     setSelectedCategory(category);
@@ -59,7 +49,7 @@ const HomePremiere: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Todas las Peliculas</h2>
+      <h2 className="text-2xl font-bold mb-4">Todas las Películas</h2>
       {loading ? ( 
         <div className="text-center">Cargando...</div>
       ) : (
